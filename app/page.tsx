@@ -1,7 +1,10 @@
+import { TypewriterEffectSmoothDemo } from "@/components/custom/TypewriterDemo";
 import Image from "next/image";
 
 export default function Home() {
   return (
-    <div>hithere</div>
+    <div>
+      <TypewriterEffectSmoothDemo/>
+    </div>
   );
 }

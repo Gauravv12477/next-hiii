@@ -3,7 +3,7 @@
 import React, { useRef, useState } from "react";
 import Link from "next/link";
 import LabelCustom from "@/components/custom/LabelCustom";
-import { InputWithLabel } from "@/components/InputWithLabel";
+import { InputWithLabel } from "@/components/custom/InputWithLabel";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -58,14 +58,6 @@ const Page = () => {
     setErrors((prevErrors) => ({ ...prevErrors, [id]: fieldErrors[id as keyof ErrorData] }));
   };
 
-  // Handle key down to move to next field
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, nextRef: React.RefObject<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      nextRef.current?.focus(); // Focus the next input field
-    }
-  };
-
   // Handle form submission
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -98,8 +90,7 @@ const Page = () => {
                 error={errors.email}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                onKeyDown={(e) => handleKeyDown(e, passwordRef)} // Pass the password ref
-                ref={emailRef} // Attach email ref
+                nextRef={passwordRef} // Specify next input
               />
 
               <InputWithLabel
@@ -111,7 +102,6 @@ const Page = () => {
                 error={errors.password}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                ref={passwordRef} // Attach password ref
               />
             </div>
 

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Link from "next/link";
 import { FaGoogle, FaGithub } from "react-icons/fa";
 import { SiOnlyfans } from "react-icons/si";
@@ -8,7 +8,7 @@ import { SiOnlyfans } from "react-icons/si";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import LabelCustom from "@/components/custom/LabelCustom";
-import { InputWithLabel } from "@/components/InputWithLabel";
+import { InputWithLabel } from "@/components/custom/InputWithLabel";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
@@ -42,6 +42,14 @@ const Page = () => {
   });
 
   const [errors, setErrors] = useState<ErrorData>({});
+
+
+   // Refs for each input field
+   const firstNameRef = useRef<HTMLInputElement>(null)
+   const lastNamRef = useRef<HTMLInputElement>(null)
+   const emailRef = useRef<HTMLInputElement>(null);
+   const passwordRef = useRef<HTMLInputElement>(null);
+   const confirmPasswordRef = useRef<HTMLInputElement>(null);
 
   // Validation function to check fields
   const validateFields = (): ErrorData => {
@@ -113,6 +121,7 @@ const Page = () => {
                   error={errors.firstName}
                   onChange={handleChange}
                   onBlur={handleBlur}
+                  nextRef={lastNamRef}
                 />
                 <InputWithLabel
                   label="Last Name"
@@ -121,6 +130,7 @@ const Page = () => {
                   error={errors.lastName}
                   onChange={handleChange}
                   onBlur={handleBlur}
+                  nextRef={emailRef}
                 />
               </div>
               <InputWithLabel
@@ -130,6 +140,7 @@ const Page = () => {
                 error={errors.email}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                nextRef={passwordRef}
               />
               <div className="grid grid-cols-2 gap-4">
                 <InputWithLabel
@@ -140,6 +151,7 @@ const Page = () => {
                   error={errors.password}
                   onChange={handleChange}
                   onBlur={handleBlur}
+                  nextRef={confirmPasswordRef}
                 />
                 <InputWithLabel
                   label="Confirm Password"
