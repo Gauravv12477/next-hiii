@@ -1,5 +1,5 @@
 // Ensure that BASE_URL is defined, or throw an error
-const apiURL = `${process.env.BASE_URL + '/api' || 'http://localhost:3000'}/api`;
+const apiURL = `${process.env.BASE_URL || 'http://localhost:3000'}/api`;
 
 
 const API_CONFIG = {

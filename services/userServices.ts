@@ -1,25 +1,25 @@
 import axiosInstance from "@/lib/interceptor";
 import ApiConfig from './../lib/apiConfig';
 
-
-interface singupPayload {
-    firstname: string,
-    lastname: string,
-    email: string,
+interface SignupPayload {
+  firstname: string;
+  lastname: string;
+  email: string;
 }
 
-interface loginPayload{
-    email: string,
-    password: string
+interface LoginPayload {
+  email: string;
+  password: string;
 }
-
-
 
 class UserServices {
-    signup(singupPayload) {
-        return axiosInstance.post(ApiConfig.signup, singupPayload);
-    }
-    login(payload){
-        return axiosInstance.post(ApiConfig.login, payload);
-    }
+  signup(payload: SignupPayload) {
+    return axiosInstance.post(ApiConfig.signup, payload);
+  }
+
+  login(payload: LoginPayload) {
+    return axiosInstance.post(ApiConfig.login, payload);
+  }
 }
+
+export default new UserServices();

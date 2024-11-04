@@ -1,19 +1,9 @@
-import type { Metadata } from "next";
-import localFont from "next/font/local";
-import "./globals.css";
+// app/layout.tsx
+import { Metadata } from "next"; // Import if you need metadata
+import "./globals.css"; // Include global styles
 import { Suspense } from "react";
-import Loading from "./loading";
-
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+import Loading from "./loading"; // Adjust this import based on your loading component
+import StoreProvider from "./StoreProvider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -22,16 +12,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode; // Explicitly define the children prop type
+}) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <Suspense fallback={<Loading/>}>{children}</Suspense>
-      </body>
-    </html>
+    <StoreProvider>
+      <html lang="en">
+        <body className="antialiased">
+          <Suspense fallback={<Loading />}>{children}</Suspense>
+        </body>
+      </html>
+    </StoreProvider>
   );
 }

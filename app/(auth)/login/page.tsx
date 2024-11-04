@@ -90,6 +90,7 @@ const Page = () => {
                 error={errors.email}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                ref={emailRef} // Attach email ref
                 nextRef={passwordRef} // Specify next input
               />
 
@@ -102,6 +103,7 @@ const Page = () => {
                 error={errors.password}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                ref={passwordRef} // Attach password ref
               />
             </div>
 
