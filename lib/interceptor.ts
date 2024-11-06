@@ -1,7 +1,18 @@
-import axios, { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import { store } from '@/store/store';
+import { logout } from '@/store/userSlice';
+import axios, { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
+const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-const baseURL: string | undefined = process.env.NEXT_PUBLIC_API_BASE_URL;
+// Helper function to safely get the token on the client-side
+const getToken = (): string | null => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('token');
+  }
+  return null;
+};
+
+const token = getToken();
 
 const axiosInstance = axios.create({
   baseURL,
@@ -10,31 +21,27 @@ const axiosInstance = axios.create({
   },
 });
 
-// Request interceptor
+// Request interceptor to attach token if available
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('token');
-      if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+    const token = getToken();
+    if (token && config.headers) {
+      // Type assertion to ensure headers type compatibility
+      config.headers.Authorization = `Bearer ${token}` as string;
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Response interceptor
+// Response interceptor for handling responses
 axiosInstance.interceptors.response.use(
-  (response: AxiosResponse): AxiosResponse => {
-    return response;
-  },
+  (response: AxiosResponse): AxiosResponse => response,
   (error) => {
     const response = error.response;
     if (response && response.status === 401) {
-    //   store.dispatch(logout());
+      // Optional: Handle unauthorized errors, such as redirecting to login
+      store.dispatch(logout());
     }
     return Promise.reject(error);
   }

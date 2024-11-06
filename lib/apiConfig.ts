@@ -5,7 +5,7 @@ const apiURL = `${process.env.BASE_URL || 'http://localhost:3000'}/api`;
 const API_CONFIG = {
   login: `${apiURL}/auth/login`,
   signup: `${apiURL}/auth/signup`,
-  Logout: `${apiURL}/auth/logout`,
+  logout: `${apiURL}/auth/logout`,
 };
 
 

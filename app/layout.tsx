@@ -4,6 +4,7 @@ import "./globals.css"; // Include global styles
 import { Suspense } from "react";
 import Loading from "./loading"; // Adjust this import based on your loading component
 import StoreProvider from "./StoreProvider";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -20,6 +21,7 @@ export default function RootLayout({
       <html lang="en">
         <body className="antialiased">
           <Suspense fallback={<Loading />}>{children}</Suspense>
+          <Toaster /> {/* This should be included at the root level */}
         </body>
       </html>
     </StoreProvider>

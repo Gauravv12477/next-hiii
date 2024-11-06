@@ -16,6 +16,7 @@ import userServices from "@/services/userServices";
 import { useDispatch } from "react-redux";
 import { login } from "@/store/userSlice";
 import { InfoCircledIcon, ReloadIcon } from "@radix-ui/react-icons";
+import { BsFillInfoCircleFill, BsInfoCircle } from "react-icons/bs";
 import { useRouter } from "next/navigation";
 
 interface UserData {
@@ -218,9 +219,9 @@ const Page = () => {
               </div>
             </div>
             {errors.api && (
-              <div className="flex items-center">
-                <FaInfo color="red" />{" "}
-                <Label className="text-red-500 mt-2">{errors.api}</Label> 
+              <div className="flex items-baseline gap-[2px]">
+                <BsInfoCircle size={15} color="red" />{" "}
+                <span className="text-red-500 mt-1 text-sm font-medium">{errors.api}</span> 
               </div>
             )}
             <Button

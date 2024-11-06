@@ -20,6 +20,11 @@ class UserServices {
   login(payload: LoginPayload) {
     return axiosInstance.post(ApiConfig.login, payload);
   }
+
+  logout() {
+    return axiosInstance.post(ApiConfig.logout);
+  }
 }
 
 export default new UserServices();
+ 

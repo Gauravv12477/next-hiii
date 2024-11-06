@@ -2,9 +2,6 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { z } from "zod";
 import bcrypt from "bcrypt";
-import jwt from 'jsonwebtoken'; // Import the jwt library
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret'; 
 
 // Define the registration schema using Zod
 const registrationSchema = z.object({
@@ -68,17 +65,12 @@ export async function POST(req: Request) {
       },
     });
 
-    //Generate JWT
-    const token = jwt.sign({
-      id: user.id,
-      email: user.email
-    }, JWT_SECRET, {expiresIn: '6h'})
+    
 
     return NextResponse.json(
       {
         message: "User created successfully",
         user,
-        token
       },
       { status: 201 }
     );

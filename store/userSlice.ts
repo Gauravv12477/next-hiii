@@ -5,7 +5,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
-interface UserState {
+export interface UserState {
     token: string | null;
     userInfo: any | null; 
 }
@@ -22,7 +22,7 @@ const userSlice = createSlice({
         login(state, action: PayloadAction<{ token: string; user: any }>) {
             state.token = action.payload.token;
             state.userInfo = action.payload.user;
-            localStorage.setItem('token', action.payload.token)
+            localStorage.setItem('userInfo', action.payload.user)
 
         },
         logout(state) {
