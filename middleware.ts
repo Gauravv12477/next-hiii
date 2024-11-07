@@ -13,7 +13,6 @@ export async function middleware(request: NextRequest) {
     // Get the token from cookies
     const tokenCookie = request.cookies.get("token");
     const token = tokenCookie ? tokenCookie.value : null; // Extract the value from the cookie
-    console.log("Token from cookie:", token);
 
     // If no token, redirect to login
     if (!token) {

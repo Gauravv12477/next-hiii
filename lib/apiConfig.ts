@@ -6,6 +6,11 @@ const API_CONFIG = {
   login: `${apiURL}/auth/login`,
   signup: `${apiURL}/auth/signup`,
   logout: `${apiURL}/auth/logout`,
+
+
+  // task API's
+
+  TaskOperations: `${apiURL}/tasks`
 };
 
 
