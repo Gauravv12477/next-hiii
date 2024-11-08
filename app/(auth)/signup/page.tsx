@@ -126,7 +126,7 @@ const Page = () => {
         if (isEqual(status, 201)) {
           dispatch(login(data));
           setLoading(false);
-          router.push("/dashboard");
+          router.push("/app");
         } else {
           // If the response status is not 200, set an API error message
           setErrors((prev) => ({

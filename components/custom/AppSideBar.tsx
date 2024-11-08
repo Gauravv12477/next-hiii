@@ -14,10 +14,9 @@ import {
 } from "@/components/ui/sidebar";
 import {
   Calendar,
+  Calendar1,
   ChevronUp,
-  Home,
   Inbox,
-  PlusCircleIcon,
   Radar,
   Search,
   Settings,
@@ -45,7 +44,8 @@ import TaskDialog from "./TaskDialog";
 
 const items = [
   { title: "Search", url: "#", icon: Search, shortcut: "ctrl + k" },
-  { title: "Inbox", url: "#", icon: Inbox },
+  { title: "Tasks", url: "/app/tasks", icon: Inbox },
+  { title: "Today", url: "/app/today", icon: Calendar1 },
   { title: "Calendar", url: "#", icon: Calendar },
   { title: "Settings", url: "#", icon: Settings },
 ];

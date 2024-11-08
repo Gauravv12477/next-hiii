@@ -1,4 +1,7 @@
+"use client"
 import React, { useState, useEffect } from "react";
+import * as chrono from "chrono-node";
+
 import {
   Dialog,
   DialogContent,
@@ -15,7 +18,7 @@ import {
   CalendarArrowDown,
   CalendarRange,
   Check,
-  CheckCheckIcon,
+  CheckCircle,
   Ellipsis,
   FlagIcon,
   SunIcon,
@@ -24,7 +27,9 @@ import { Badge } from "../ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Calendar } from "../ui/calendar";
 import { isEqual } from "lodash";
-import { Cross1Icon } from "@radix-ui/react-icons";
+import { Cross1Icon, ReloadIcon } from "@radix-ui/react-icons";
+import taskServices from "@/services/taskServices";
+import { useToast } from "../hooks/use-toast";
 
 // Utility function to get weekday as a short label
 const getWeekday = (date: Date) =>
@@ -96,94 +101,30 @@ const quickAccessItems = [
 ];
 
 const priorityItem = [
-  { id: 1, color: "red" , value: "LOW"  },
-  { id: 2, color: "yellow" , value: "MEDIUM"},
-  { id: 3, color: "blue" , value: "HIGH"},
+  { id: 1, color: "red", value: "LOW" },
+  { id: 2, color: "yellow", value: "MEDIUM" },
+  { id: 3, color: "blue", value: "HIGH" },
   { id: 4, color: "lightgray", value: "URGENT" },
 ];
 
 // <----date-->
+
 const parseDateInput = (
   input: string
 ): { date: Date | null; time: Date | null } => {
-  const now = new Date();
+  const result: { date: Date | null; time: Date | null } = {
+    date: null,
+    time: null,
+  };
+  const parsedDate = chrono.parseDate(input);
 
-  // Default to null for both date and time
-  const result = { date: null, time: null };
-
-  // Check if the input doesn't contain date/time-related words
-  const nonDateRelatedInput = /today's task|drink water|task/i.test(
-    input.toLowerCase()
-  );
-  if (nonDateRelatedInput) {
-    return result; // Return null for both date and time if input is unrelated to date/time
+  if (parsedDate) {
+    const hasTime = parsedDate.getHours() || parsedDate.getMinutes();
+    result.date = parsedDate;
+    result.time = hasTime ? parsedDate : null;
   }
 
-  // Define patterns for various formats, including flexible date and time
-  const regexPatterns = [
-    // Full date with time (e.g., "2 Jan 2025, 2pm")
-    {
-      regex:
-        /(\d{1,2})\s*(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s*(\d{4})?,?\s*(\d{1,2})?\s*(am|pm)?/i,
-      transform: (match: any) => {
-        const day = parseInt(match[1]);
-        const month = match[2].toLowerCase();
-        const year = match[3] ? parseInt(match[3]) : now.getFullYear();
-        const hour = match[4] ? parseInt(match[4]) % 12 : 0; // Default to 0 if no hour provided
-        const isPM = match[5]?.toLowerCase() === "pm";
-        const finalHour = isPM ? hour + 12 : hour;
-
-        const monthIndex = new Date(Date.parse(`${month} 1, 2021`)).getMonth();
-        const date = new Date(year, monthIndex, day, finalHour);
-
-        // Return both date and time objects
-        return { date, time: new Date(year, monthIndex, day, finalHour) };
-      },
-    },
-    // Date only (e.g., "5 Apr" or "2 Jan 2025")
-    {
-      regex:
-        /(\d{1,2})\s*(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)(?:\s*(\d{4}))?/i,
-      transform: (match: any) => {
-        const day = parseInt(match[1]);
-        const month = match[2].toLowerCase();
-        const year = match[3] ? parseInt(match[3]) : now.getFullYear();
-
-        const monthIndex = new Date(Date.parse(`${month} 1, 2021`)).getMonth();
-        const date = new Date(year, monthIndex, day);
-
-        // Return date object and null for time
-        return { date, time: null };
-      },
-    },
-    // Time only (e.g., "6pm" or "2:30 PM")
-    {
-      regex: /(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/i,
-      transform: (match: any) => {
-        const hour = parseInt(match[1]) % 12;
-        const minute = match[2] ? parseInt(match[2]) : 0;
-        const isPM = match[3]?.toLowerCase() === "pm";
-        const finalHour = isPM ? hour + 12 : hour;
-
-        const time = new Date(now);
-        time.setHours(finalHour, minute, 0, 0);
-
-        // Return null for date and time object for the time
-        return { date: null, time };
-      },
-    },
-    // Add additional patterns as necessary
-  ];
-
-  // Iterate through patterns and attempt to match
-  for (const pattern of regexPatterns) {
-    const match = input.match(pattern.regex);
-    if (match) {
-      return pattern.transform(match); // Return transformed result if match is found
-    }
-  }
-
-  return result; // Return { date: null, time: null } by default if no pattern matches
+  return result;
 };
 
 interface TaskDialogProps {
@@ -193,38 +134,84 @@ interface TaskDialogProps {
 
 const TaskDialog = ({ open, setOpen }: TaskDialogProps) => {
   // Date and time states
-  // const [taskTime, setTaskTime] = useState<Date | undefined>(new Date());
-  const [date, setDate] = React.useState<Date | undefined>(undefined);
-  const [taskDate, setTaskDate] = useState<Date | undefined>(new Date());
+  const { toast } = useToast()
+  const [date, setDate] = useState<Date | undefined>(undefined);
+  const [taskDate, setTaskDate] = useState<Date | null>(null);
   const [taskInput, setTaskInput] = useState("");
+  const [description, setDescription] = useState(""); // Description of the task
   const [priority, setPriority] = useState<string | undefined>(undefined);
 
-  // Set date function that also updates taskInput
+  const [loading, setLoading] = useState(false);
+
+  // Input change handler with parsing
   const handleDateChange = (dateProp: Date | undefined) => {
     setDate(dateProp);
-    if (dateProp) {
-    }
+    if (!dateProp) setTaskDate(null);
   };
-  console.log("first", date);
 
-  // Handle user input and parse for date-related terms
+  // Input change handler with parsing
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setTaskInput(value);
+    const { date: parsedDate } = parseDateInput(value);
+    if (parsedDate) {
+      setTaskDate(parsedDate);
+      setDate(parsedDate);
+    }
+  };
 
-    const { date } = parseDateInput(value);
-    if (date) {
-      setTaskDate(date);
-      // setTaskInput(formatDateForInput(date)); // Update input box with formatted date
-      setDate(date);
+  const handleSaveTask = async () => {
+    setLoading(true);
+
+    if (!taskInput.trim()) {
+      setLoading(false); // Reset loading if there's no input
+      return;
+    }
+
+    const payload = {
+      title: taskInput.trim(),
+      description: description.trim(),
+      dueDate: taskDate || date,
+      priority: priority,
+    };
+
+    try {
+      const response = await taskServices.createTask(payload);
+
+      if (response && response.status === 201) {
+        toast({
+          title: "Task Created",
+          description: `${response.data.title} is created Successfully!!}`,
+          className: 'bg-green-200'
+        })
+        return response.data;
+      } else {
+        toast({
+          title: "Oh! something went wrong",
+          description: `${response.data}`,
+          variant: 'destructive'
+        })
+      }
+    } catch (error: any) {
+      toast({
+        title: "Oh! something went wrong",
+        description: `${error.error}`,
+        variant: 'destructive'
+      })
+    } finally {
+      setLoading(false); // Ensure loading state resets on both success and error
+      setOpen(false);
     }
   };
 
   useEffect(() => {
-    setDate(undefined);
-    setPriority(undefined);
-    setTaskInput("");
-  },[open])
+    if (!open) {
+      setDate(undefined);
+      setPriority(undefined);
+      setTaskInput("");
+      setDescription("");
+    }
+  }, [open]);
 
   // Render logic remains mostly the same
   return (
@@ -250,6 +237,7 @@ const TaskDialog = ({ open, setOpen }: TaskDialogProps) => {
             <Input
               placeholder="Description"
               className="border-none outline-none focus-visible:outline-none focus-visible:ring-0 mt-2"
+              onChange={(e) => setDescription(e.target.value)}
             />
           </div>
           <div className="flex space-x-2 mt-4 pt-3">
@@ -265,12 +253,14 @@ const TaskDialog = ({ open, setOpen }: TaskDialogProps) => {
                         date && isEqual(item.title, "Due Date")
                           ? "green"
                           : priority && isEqual(item.title, "Priority")
-                          ? priorityItem.find((pr) => pr.value === priority)?.color
+                          ? priorityItem.find((pr) => pr.value === priority)
+                              ?.color
                           : "gray"
                       }`}
                       fill={`${
                         priority && isEqual(item.title, "Priority")
-                          ? priorityItem.find((pr) => pr.value === priority)?.color
+                          ? priorityItem.find((pr) => pr.value === priority)
+                              ?.color
                           : "none"
                       }`}
                       className="h-4 w-4"
@@ -292,7 +282,11 @@ const TaskDialog = ({ open, setOpen }: TaskDialogProps) => {
                         // Content for when the title is "Priority"
                         <span className="flex gap-1 text-black">
                           {" "}
-                          P {priorityItem.find((pri)=> pri.value === priority)?.id}{" "}
+                          P{" "}
+                          {
+                            priorityItem.find((pri) => pri.value === priority)
+                              ?.id
+                          }{" "}
                           <Cross1Icon
                             className="hover:text-red-400"
                             onClick={() => setPriority(undefined)}
@@ -340,7 +334,7 @@ const TaskDialog = ({ open, setOpen }: TaskDialogProps) => {
                         </p>
                         <Calendar
                           mode="single"
-                          selected={date}
+                          selected={date || undefined}
                           onSelect={(selectedDate) =>
                             handleDateChange(selectedDate)
                           }
@@ -391,11 +385,18 @@ const TaskDialog = ({ open, setOpen }: TaskDialogProps) => {
           </div>
         </DialogHeader>
         <DialogFooter>
-          <Button onClick={() => setOpen(false)} variant="outline">
+          <Button disabled={loading} onClick={() => setOpen(false)} variant="outline">
             Cancel
           </Button>
-          <Button className="bg-red-600" onClick={() => setOpen(false)}>
-            Save
+          <Button className="bg-red-600" onClick={handleSaveTask}>
+            {loading ? (
+              <>
+                {/* <ReloadIcon className="mr-2 h-4 w-4 animate-spin" /> */}
+                Saving..
+              </>
+            ) : (
+              "Login"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

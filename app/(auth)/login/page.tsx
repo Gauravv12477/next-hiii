@@ -92,7 +92,7 @@ const Page = () => {
         // Check API response status
         if (status === 200) {
           dispatch(login(data));
-          router.push("/dashboard");
+          router.push("/app");
         } else {
           setErrors((prev) => ({
             ...prev,
