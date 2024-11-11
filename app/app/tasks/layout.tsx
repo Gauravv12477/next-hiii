@@ -5,7 +5,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div>
       <main className="w-full flex justify-center ">
-        <div className="bg-fuchsia-200">
+        <div className="w-1/2">
           <Suspense fallback={<Loading />}>{children}</Suspense>
         </div>
       </main>

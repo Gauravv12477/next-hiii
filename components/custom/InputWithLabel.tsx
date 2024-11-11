@@ -6,6 +6,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 interface InputWithLabelProps {
   label: string;
   placeholder: string;
+  value?: string,
   id?: string;
   type?: string;
   required?: boolean;
@@ -28,6 +29,7 @@ export const InputWithLabel = forwardRef<HTMLInputElement, InputWithLabelProps>(
       error,
       className,
       nextRef,
+      value,
       ...props
     },
     ref
@@ -52,6 +54,7 @@ export const InputWithLabel = forwardRef<HTMLInputElement, InputWithLabelProps>(
             id={inputId}
             placeholder={placeholder}
             required={required}
+            value={value}
             ref={ref} // Use the ref from forwardRef
             onKeyDown={handleKeyDown}
             {...props}

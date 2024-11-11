@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <StoreProvider>
       <html lang="en">
-        <body className="antialiased">
+        <body className="">
           <Suspense fallback={<Loading />}>{children}</Suspense>
           <Toaster /> {/* This should be included at the root level */}
         </body>

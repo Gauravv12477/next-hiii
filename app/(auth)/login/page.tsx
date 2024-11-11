@@ -129,6 +129,7 @@ const Page = () => {
               <InputWithLabel
                 label="Email"
                 id="email"
+                value={userData.email}
                 type="email"
                 required
                 placeholder="Enter your Email"
@@ -143,6 +144,8 @@ const Page = () => {
                 label="Password"
                 id="password"
                 type="password"
+                value={userData.password}
+
                 required
                 placeholder="Enter Password"
                 error={errors.password}
