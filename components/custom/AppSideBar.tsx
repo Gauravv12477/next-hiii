@@ -12,16 +12,20 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+
 import {
   Calendar,
   Calendar1,
   ChevronUp,
+  Hash,
   Inbox,
+  Plus,
   Radar,
   Search,
   Settings,
   User2,
 } from "lucide-react";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,9 +42,9 @@ import { useRouter } from "next/navigation";
 import { useToast } from "../hooks/use-toast";
 import CustomAlertDialog from "./CustomAlertDialog";
 import { FaPlusCircle } from "react-icons/fa";
-import CommandDiv from "./CommandDiv";
 import { CommandDialogDemo } from "./CommandCustomSidebar";
 import TaskDialog from "./TaskDialog";
+import OrgDialog from "./OrgDialog";
 
 const items = [
   { title: "Search", url: "#", icon: Search, shortcut: "ctrl + k" },
@@ -57,19 +61,17 @@ interface UserType {
   lastname: string;
 }
 
-export function   AppSidebar() {
+export function AppSidebar({ setTaskState }: any) {
   const router = useRouter();
   const userInfo = useSelector((state: RootState) => state.user);
   const [userData, setUserData] = useState<UserType | null>(null);
   const { toast } = useToast();
-  
-  
+
   // Dialog Handler
-  const [isDialogOpen, setDialogOpen] = useState(false);     //logout
-  const [searchDialog, setSearchDialog] = useState(false);   //search dialog
-  const [taskDialog, settaskDialog] = useState(false);       //task Dialog
-
-
+  const [isDialogOpen, setDialogOpen] = useState(false); //logout
+  const [searchDialog, setSearchDialog] = useState(false); //search dialog
+  const [taskDialog, settaskDialog] = useState(false); //task Dialog
+  const [orgDialog, setOrgDialog] = useState(false);
 
   // Effect to set user data from Redux store
   useEffect(() => {
@@ -110,6 +112,8 @@ export function   AppSidebar() {
     }
   };
 
+  const handleOpenOrgDialog = async () => {};
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -123,12 +127,17 @@ export function   AppSidebar() {
       <SidebarContent>
         {/* add task button */}
         <SidebarGroup>
-          <span className="flex items-center gap-1 ml-2 text-red-700 font-semibold cursor-pointer" onClick={ () => settaskDialog(!taskDialog)} >
+          <span
+            className="flex items-center gap-1 ml-2 text-red-700 font-semibold cursor-pointer"
+            onClick={() => settaskDialog(!taskDialog)}
+          >
             <FaPlusCircle color="red" size={20} /> Add Task
           </span>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-md font-medium text-gray-500">
+            Application
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) =>
@@ -146,10 +155,15 @@ export function   AppSidebar() {
                       >
                         <div className="flex gap-1">
                           <item.icon />
-                          <span>{item.title}</span> 
+                          <span>{item.title}</span>
                         </div>
                         {/* {item.shortcut && <CommandDiv label="ctrl + k" />} */}
-                        {item.shortcut &&  <CommandDialogDemo state={searchDialog} onClose={() => setSearchDialog(false)} />}
+                        {item.shortcut && (
+                          <CommandDialogDemo
+                            state={searchDialog}
+                            onClose={() => setSearchDialog(false)}
+                          />
+                        )}
                       </a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -172,8 +186,43 @@ export function   AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-      </SidebarContent>
 
+        {/* organisation */}
+
+        <SidebarGroup>
+          <SidebarGroupLabel
+            className="flex cursor-pointer justify-between text-md font-medium text-gray-500 group hover:text-gray-700"
+            onClick={() => setOrgDialog(!orgDialog)}
+          >
+            <div>Organisations</div>
+
+            <div className="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
+              <Plus size={16} onClick={() => setOrgDialog(!orgDialog)} />
+            </div>
+          </SidebarGroupLabel>
+
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {items.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <a
+                      className="flex justify-between items-center cursor-pointer"
+                      href={item.url}
+                    >
+                      <div className="flex gap-1">
+                        <Hash />
+                        <span>{item.title}</span>
+                      </div>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        {/* </Collapsible> */}
+      </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -229,8 +278,17 @@ export function   AppSidebar() {
 
       {/* Taskbar Dialogbox */}
 
-      <TaskDialog open={taskDialog} setOpen={settaskDialog} />
+      <OrgDialog
+        open={orgDialog}
+        setOpen={setOrgDialog}
+        setTaskState={setTaskState}
+      />
 
+      <TaskDialog
+        open={taskDialog}
+        setOpen={settaskDialog}
+        setTaskState={setTaskState}
+      />
     </Sidebar>
   );
 }

@@ -2,6 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global styles (in globals.css or a separate file) */
+
+::-webkit-scrollbar {
+  width: 5px; 
+  height: 0.5rem;
+  background-color: #7b7b81;
+  border-radius: 0.5rem;
+}
+
+::-webkit-scrollbar-track {
+  background: #dcdadd;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #807ea1;
+  border-radius: 0.5rem;
+  background: linear-gradient(180deg, rgb(163, 163, 165) 0%, rgb(186, 186, 187) 100%);
+  border: 1px solid rgba(170, 170, 170, 0.5);
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

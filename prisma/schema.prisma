@@ -6,44 +6,38 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
+
 model User {
-  id          String        @id @default(uuid())
-  email       String        @unique
-  firstname   String?
-  lastname    String?
-  password    String
-  projects    Project[] // Relation to projects created by the user
-  tasks       Task[] // Relation to tasks assigned to the user
-  todos       Todo[] // Relation to user's todos
-  comments    Comment[]
-  createdAt   DateTime      @default(now())
-  ProjectUser ProjectUser[]
+  id               String             @id @default(uuid())
+  email            String             @unique
+  firstname        String?
+  lastname         String?
+  password         String
+  projects         Project[] // Relation to projects created by the user
+  tasks            Task[] // Relation to tasks assigned to the user
+  todos            Todo[] // Relation to user's todos
+  comments         Comment[]
+  createdAt        DateTime           @default(now())
+  ProjectUser      ProjectUser[]
+  OrderTaskListing OrderTaskListing[]
 }
 
 model Project {
-  id          String       @id @default(uuid()) // Changed to UUID
+  id          String        @id @default(uuid()) // Changed to UUID
   name        String
   description String?
   color       String? // Customizable color for the project
   userId      String // Foreign key to User (adjusted to UUID)
-  user        User     @relation(fields: [userId], references: [id])
+  user        User          @relation(fields: [userId], references: [id])
   tasks       Task[] // Relation to tasks within this project
-  sections    Section[] // Relation to sections within this project
   sharedUsers ProjectUser[] // Relation for shared project users
   createdAt   DateTime      @default(now())
 }
 
-model Section {
-  id        String      @id @default(uuid()) // Changed to UUID
-  name      String
-  projectId String // Foreign key to Project (adjusted to UUID)
-  project   Project  @relation(fields: [projectId], references: [id])
-  tasks     Task[] // Tasks within the section
-  createdAt DateTime @default(now())
-}
+
 
 model Task {
-  id          String      @id @default(uuid()) // Changed to UUID
+  id          String     @id @default(uuid()) // Changed to UUID 
   title       String
   description String?
   dueDate     DateTime?
@@ -55,9 +49,7 @@ model Task {
   user        User       @relation(fields: [userId], references: [id])
   projectId   String? // Foreign key to Project (adjusted to UUID)
   project     Project?   @relation(fields: [projectId], references: [id])
-  sectionId   String? // Foreign key to Section (adjusted to UUID)
-  section     Section?   @relation(fields: [sectionId], references: [id])
-  labels      Label[]    @relation("TaskLabels") // No `references` needed for implicit many-to-many
+  //labels      Label[]    @relation("TaskLabels") // No `references` needed for implicit many-to-many
   reminders   Reminder[]
   comments    Comment[]
   todos       Todo[] // Relation to todos (subtasks) under this task
@@ -79,16 +71,16 @@ model Label {
   id    String  @id @default(uuid()) // Changed to UUID
   name  String  @unique
   color String?
-  tasks Task[]  @relation("TaskLabels") // No `references` needed for implicit many-to-many
+  // tasks Task[]  @relation("TaskLabels") // No `references` needed for implicit many-to-many
 }
 
 model Comment {
   id        String   @id @default(uuid()) // Changed to UUID
   content   String
   createdAt DateTime @default(now())
-  userId    String   // Foreign key to User (adjusted to UUID)
+  userId    String // Foreign key to User (adjusted to UUID)
   user      User     @relation(fields: [userId], references: [id]) // Relationship with User
-  taskId    String   // Foreign key to Task (adjusted to UUID)
+  taskId    String // Foreign key to Task (adjusted to UUID)
   task      Task     @relation(fields: [taskId], references: [id]) // Relationship with Task
 }
 
@@ -102,10 +94,17 @@ model Reminder {
 model ProjectUser {
   id        String  @id @default(uuid()) // Changed to UUID
   projectId String // Foreign key to Project (adjusted to UUID)
-  project   Project @relation(fields: [projectId], references: [id])
+  project   Project @relation(fields: [projectId], references: [id])    
   userId    String // Foreign key to User (adjusted to UUID)
   user      User    @relation(fields: [userId], references: [id])
   role      Role // Role of the user in the project
+}
+
+model OrderTaskListing {
+  id     String   @id @default(uuid())
+  userId String   @unique
+  user   User     @relation(fields: [userId], references: [id])
+  taskId String[]
 }
 
 enum Priority {

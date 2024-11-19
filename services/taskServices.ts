@@ -14,6 +14,7 @@ interface updateTaskPayload {
   dueDate?: Date;
   description?: string;
   priority?: string;
+  completed?: boolean;
 }
 
 class TaskServices {
@@ -25,10 +26,17 @@ class TaskServices {
     return axiosInstance.get(ApiConfig.TaskOperations);
   }
 
-  updateTask({ payload, id }: { payload: updateTaskPayload; id: string }) {
+  updateTask({ id, payload }: { id: string; payload: updateTaskPayload }) {
     return axiosInstance.patch(`${ApiConfig.TaskOperations}/${id}`, payload);
+  }
+
+  deleteTask({ id }: { id: string }) {
+    return axiosInstance.delete(`${ApiConfig.TaskOperations}/${id}`);
+  }
+
+  updateOrderListing(payload: any) {
+    return axiosInstance.patch(`${ApiConfig.TaskOperations}/order`, payload);
   }
 }
 
 export default new TaskServices();
-

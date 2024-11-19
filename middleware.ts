@@ -24,7 +24,7 @@ export async function middleware(request: NextRequest) {
     try {
       const { payload } = await jwtVerify(token, JWT_SECRET); // Using jwtVerify for JWT
 
-      console.log(payload); // This will give you the decoded payload if the token is valid.
+      console.log(payload); 
     } catch (error) {
       console.log("JWT verification failed: ", error);
       const loginUrl = new URL("/login", request.url);
@@ -51,6 +51,8 @@ export async function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
   if (userId) {
+    console.log('userId',userId)
+    // const userId = req.headers.get("x-user-id");
     response.headers.set("x-user-id", userId); // Set the userId in the response headers
   }
 
@@ -64,6 +66,7 @@ export const config = {
     "/profile/:path*",
     "/settings/:path*",
     "/tasks/:path*",
+    "/tasks/:id*",
     "/api/:path*",
   ], // Match paths and nested paths
 };
